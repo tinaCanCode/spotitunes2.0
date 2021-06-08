@@ -16,17 +16,17 @@ router.get('/itunes', (req, res, next) => {
 });
 
 
-//GET itunes results page
-router.get('/itunes/search-results', (req, res, next) => {
-  console.log("HERE IS THE QUERY to iTunes: " + req.query.podcast)
+//GET itunes results page --> obsolete since integration with search in podcast.js
+// router.get('/itunes/search-results', (req, res, next) => {
+//   console.log("HERE IS THE QUERY to iTunes: " + req.query.podcast)
 
-  itunes.podcast(req.query.podcast, { limit: 20 }).then(data => {
-    console.log("Response from itunes", data) //podcast info in results array
-    res.render('itunes/search-results', { searchResults: data.results })
-  }).catch(error => {
-    res.render('itunes/search-results')
-  })
-})
+//   itunes.podcast(req.query.podcast, { limit: 20 }).then(data => {
+//     console.log("Response from itunes", data) //podcast info in results array
+//     res.render('itunes/search-results', { searchResults: data.results })
+//   }).catch(error => {
+//     res.render('itunes/search-results')
+//   })
+// })
 
 // iTunes DETAILS page
 

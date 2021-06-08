@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const unirest = require('unirest');
+const itunesApi = require('itunes-web-api')
 const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
@@ -30,34 +30,29 @@ router.get('/search', (req, res, next) => {
 router.get('/search-results', (req, res) => {
   //console.log("HERE IS THE QUERY: " + req.query.podcast)
 
-  //Replace LN with itunes here
-  const listenNotesSearch = unirest.get(`https://listen-api.listennotes.com/api/v2/search?q=${req.query.podcast}&type=podcast`)
-    .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
-  const spotifySearch = spotifyApi
-    .searchShows(req.query.podcast, { market: "DE", limit: 6 })
+  const itunesSearch = itunesApi.podcast(req.query.podcast, { limit: 6 })
+  const spotifySearch = spotifyApi.searchShows(req.query.podcast, { market: "DE", limit: 6 })
 
-  //console.log("LN: ", listenNotesSearch)
-
-  Promise.all([listenNotesSearch, spotifySearch]).then((response) => {
-    // console.log("THIS IS THE SEARCH RESULT: " + response);
-    // console.log("THIS IS THE SEARCH RESULT NUMBER 1 LN: " + response[0].toJSON().body.results[0]);
-    // console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
-
+  Promise.all([itunesSearch, spotifySearch]).then((response) => {
+    //console.log("THIS IS THE SEARCH RESULT: " + response);
+    //console.log("THIS IS THE SEARCH RESULT NUMBER 1 LN: " + response[0].toJSON().body.results[0]);
+    //console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
+    //console.log("THIS IS THE SEARCH RESULT FOR ITUNES: ", response[0]);
 
     // Values stored into variables
     let allResults = []
-    let listenNotesResults = response[0].toJSON().body.results
+    let itunesResults = response[0].results
     let spotifyResults = response[1].body.shows.items
 
-    // Create smaller and uniformised ListenNotes podcasts object
-    for (let i = 0; i < listenNotesResults.length; i++) {
+    //Create smaller and uniformised itunes podcasts object
+    for (let i = 0; i < itunesResults.length; i++) {
       let resultSummary = {
-        id: listenNotesResults[i].id,
-        publisher: listenNotesResults[i].publisher_original,
-        title: listenNotesResults[i].title_original,
-        imageURL: listenNotesResults[i].image,
-        description: listenNotesResults[i].description_original,
-        origin: "listenNotes"
+        id: itunesResults[i].collectionId,
+        publisher: itunesResults[i].artistName,
+        title: itunesResults[i].collectionName,
+        imageURL: itunesResults[i].artworkUrl600,
+        description: itunesResults[i].genres[0],
+        origin: "itunes"
       }
       allResults.push(resultSummary)
     }
@@ -94,7 +89,6 @@ router.get('/search-results', (req, res) => {
       }
     });
 
-    //console.log("TEST FOR MERGED RESULTS 1: " + allResults[0].title)
     res.render('search-results', { allResults: uniqueResults.sort(compare), user: req.session.currentUser })
   })
     .catch(err => console.log('The error while searching podcasts occurred: ', err))
