@@ -1,0 +1,53 @@
+{{> navbar }}
+
+<div class='container-fluid padding'>
+  <div class='row welcome text-center'>
+    <div class='col-12'>
+      <h5 class='display-4'>iTunes Podcast Search Results</h5>
+      <hr class="my-4 wow">
+    </div>
+
+  </div>
+</div>
+
+
+
+<div class='container-fluid padding'>
+
+  <div class='row padding text-center'>
+    {{#each searchResults}}
+    <div class='col-md-3'>
+      <div class='card'>
+        <a href="/itunes/details/{{this.collectionId}}"><img class='card-img-top' src="{{this.artworkUrl600}}"></a>
+        <div class='card-body'>
+          <h5 class='title-card'><a href="itunes/details/{{this.collectionId}}">{{this.collectionName}}</a></h5>
+          <p class="podcast-title">{{this.artistName}}</p>
+          <a href="/itunes/details/{{this.collectionId}}"><button class="btn btn-outline-secondary btn-sm show-details">Show details</button></a>
+          <form action="/{{this.origin}}/{{this.collectionId}}/addtofavorite" method="post">
+            <button class="btn btn-outline-secondary btn-sm">Add to favorites</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+</div>
+
+{{!-- </div> --}}
+
+
+
+
+
+</div>
+{{!-- {{#each resultsOverviewSPotify}}
+  <div>
+    <h2><a href="spotify/details/{{this.id}}">{{this.name}}</a></h2>
+    <img class="podcastImg" src="{{this.images.[1].url}}">
+    <form action="/spotify/{{this.id}}/addtofavorite" method="post">
+      <button>Add to favorites</button>
+    </form>
+
+  </div>
+  {{/each}} --}}

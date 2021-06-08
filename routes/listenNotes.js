@@ -9,9 +9,11 @@ const actions = require('../modules/actions');
 const { default: Axios } = require('axios');
 
 /* GET search page */
-router.get('/listennotes', (req, res, next) => {
-  res.render('listennotesviews/search');
-});
+//Not needed anymore - consider removing
+
+// router.get('/listennotes', (req, res, next) => {
+//   res.render('listennotesviews/search');
+// });
 
 
 
@@ -34,12 +36,12 @@ router.get("/listennotes/details/:showId", (req, res) => {
     .get(`https://listen-api.listennotes.com/api/v2/podcasts/${req.params.showId}?sort=recent_first`)
     .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
 
-  const fromDb = Podcast.exists({ podcastId: req.params.showId })
+  const fromDb = Podcast.exists({ podcastId: req.params.showId }) //Why are we checking the DB?
     .then(podcastExists => {
       if (podcastExists) {
         return Podcast.findOne({ podcastId: req.params.showId })
       } else {
-        return Podcast.create({ podcastId: req.params.showId, origin: "listennotes" })
+        return Podcast.create({ podcastId: req.params.showId, origin: "listennotes" }) //Why are we creating this?
       }
     })
     .catch(err => console.log('The error while searching show occurred: ', err));

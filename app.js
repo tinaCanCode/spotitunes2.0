@@ -100,7 +100,7 @@ hbs.registerPartials(__dirname + "/views/partials");
 
 // default value for title local
 // app.locals.title = 'Spotitunes - Find all your favorite Podcasts in one App';
-app.locals.title = 'Irontunes';
+app.locals.title = 'Spotitunes';
 
 
 
@@ -115,6 +115,9 @@ app.use("/", listenNotes);
 
 const spotify = require("./routes/spotify");
 app.use("/spotify", spotify);
+
+const itunes = require("./routes/itunes");
+app.use("/", itunes);
 
 const podcasts = require("./routes/podcasts");
 app.use("/", podcasts);

@@ -25,7 +25,7 @@ spotifyApi
   .then(data => spotifyApi.setAccessToken(data.body['access_token']))
   .catch(error => console.log('Something went wrong when retrieving an access token', error));
 
-// display the signup form to users
+// display the signup form to users --> duplicate from auth.js
 
 router.get('/signup', (req, res) => {
   res.render('auth/signup')

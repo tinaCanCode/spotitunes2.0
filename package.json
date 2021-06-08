@@ -20,6 +20,7 @@
     "express": "^4.16.3",
     "express-session": "^1.17.1",
     "hbs": "^4.0.1",
+    "itunes-web-api": "^1.0.7",
     "jsdom": "^16.4.0",
     "mocha": "^8.2.1",
     "mongoose": "^5.2.10",

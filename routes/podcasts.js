@@ -5,6 +5,7 @@ const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
 
+// same code in auth.js --> Can this duplication be removed?
 //require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
 
@@ -22,21 +23,24 @@ spotifyApi
 
 /* GET search page */
 router.get('/search', (req, res, next) => {
-  res.render('search', {user: req.session.currentUser});
+  res.render('search', { user: req.session.currentUser });
 });
 
+// Query of search term to both APIs
 router.get('/search-results', (req, res) => {
   //console.log("HERE IS THE QUERY: " + req.query.podcast)
+
+  //Replace LN with itunes here
   const listenNotesSearch = unirest.get(`https://listen-api.listennotes.com/api/v2/search?q=${req.query.podcast}&type=podcast`)
     .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
   const spotifySearch = spotifyApi
     .searchShows(req.query.podcast, { market: "DE", limit: 6 })
 
-    console.log("LN: ", listenNotesSearch)
+  //console.log("LN: ", listenNotesSearch)
 
   Promise.all([listenNotesSearch, spotifySearch]).then((response) => {
     // console.log("THIS IS THE SEARCH RESULT: " + response);
-    console.log("THIS IS THE SEARCH RESULT NUMBER 1 LN: " + response[0].toJSON().body.results[0]);
+    // console.log("THIS IS THE SEARCH RESULT NUMBER 1 LN: " + response[0].toJSON().body.results[0]);
     // console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
 
 
@@ -91,7 +95,7 @@ router.get('/search-results', (req, res) => {
     });
 
     //console.log("TEST FOR MERGED RESULTS 1: " + allResults[0].title)
-    res.render('search-results', { allResults: uniqueResults.sort(compare) , user: req.session.currentUser })
+    res.render('search-results', { allResults: uniqueResults.sort(compare), user: req.session.currentUser })
   })
     .catch(err => console.log('The error while searching podcasts occurred: ', err))
 })

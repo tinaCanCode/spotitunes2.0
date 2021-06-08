@@ -106,8 +106,6 @@ router.post('/signup', (req, res) => {
 
 // router.get('/userProfile', (req, res) => res.render('users/user-profile'));
 
-// module.exports = router;
-
 //////////// L O G I N ///////////
 
 // display the LOGIN form
