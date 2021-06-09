@@ -1,8 +1,10 @@
-const Podcast = require("../models/Podcast")
-const User = require("../models/User")
+const Podcast = require("../models/Podcast");
+const User = require("../models/User");
 const SpotifyWebApi = require('spotify-web-api-node');
 const Playlist = require('../models/Playlist');
 const unirest = require('unirest');
+const https = require('https');
+const axios = require('axios');
 
 // setting the spotify-api goes here:
 const spotifyApi = new SpotifyWebApi({
@@ -18,7 +20,10 @@ spotifyApi
 
 
 module.exports = {
-  addToFavorites(podcastId, userId) {
+
+  // Actions for spotify
+
+  addToFavorites(podcastId, userId) { //rename to add favorites Spotify
 
     return Podcast.exists({ podcastId: podcastId })
       .then(podcastExists => {
@@ -140,6 +145,51 @@ module.exports = {
       })
   },
 
+  // Actions for iTunes
+
+  async lookupPodcastId(podcastId) {
+
+    // Option 1 with node https request
+    // https.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcast`, (resp) => {
+    //   //console.log('Status Code', res.statusCode);
+    //   let str = '';
+    //   resp.on('data', (d) => {
+    //     process.stdout.write(d);
+    //     str += d;
+    //   })
+    //   resp.on('end', () => {
+    //     let fromItunes = JSON.parse(str)
+    //     console.log("Action: Response From iTunes: ", fromItunes)
+    //     // Add code to send data where the function is used
+    //   })
+    // })
+
+    // Option 2 with axios
+    return await axios.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcast`)
+
+  },
+
+
+
+  addToFavoritesIT(podcastId, userId) {
+    return Podcast.exists({ podcastId: podcastId })
+      .then(podcastExists => {
+        if (!podcastExists) {
+          return Podcast.create({ podcastId: podcastId, origin: "itunes" })
+        } else {
+          return Podcast.findOne({ podcastId: podcastId })
+        }
+      })
+      // Add ObjectId of existing or newly created Podcast to Users favorite podcasts
+      .then(resp => {
+        console.log("Response from mongo:", resp)
+        return User.findOneAndUpdate({ _id: userId },
+          { $push: { favoritePodcasts: resp._id } }, { new: true })
+      })
+  },
+
+  //Actions for LN (remove)
+
   addToFavoritesLN(podcastId, userId) {
     return Podcast.exists({ podcastId: podcastId })
       .then(podcastExists => {
@@ -195,7 +245,7 @@ module.exports = {
     return Podcast.exists({ podcastId: showId })
       .then(podcastExists => {
         if (!podcastExists) {
-          return Podcast.create({ podcastId: showId , origin: "listennotes"})
+          return Podcast.create({ podcastId: showId, origin: "listennotes" })
         } else {
           return Podcast.findOne({ podcastId: showId })
         }

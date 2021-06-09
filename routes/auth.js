@@ -237,25 +237,33 @@ router.get('/userProfile', (req, res) => {
       }).then(podcasts => {
         console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
         return Promise.all(podcasts.map(async (podcast) => {
-          console.log(podcast.podcastId)
+          console.log("Podcast ID", podcast.podcastId)
           if (podcast.origin === "spotify") {
-            return await spotifyApi.getShow(podcast.podcastId, { market: "DE" })
+            return await spotifyApi.getShow(podcast.podcastId, { market: "DE" });
           }
+          else if (podcast.origin === "itunes") {
+            return actions.lookupPodcastId(podcast.podcastId);
+          }
+          //remove
           else if (podcast.origin === "listennotes") {
             const lnResponse = await unirest.get(`https://listen-api.listennotes.com/api/v2/podcasts/${podcast.podcastId}?sort=recent_first`)
-              .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
+            .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
             return lnResponse.toJSON();
           }
+          //console.log("Response from itunes in auth.js: ", itunesResponse)
         }))
         // console.log("PodcastDetails: ", podcastDetails)
         // return podcastDetails
       })
       .then(allPodcasts => {
-        // console.log("THIS IS THE SPOTIFY REPSONSE :" + allPodcasts[3].body.name)
+        //console.log("All podcasts :", allPodcasts)
+        //console.log("iTunes response in auth: ", allPodcasts[1].data.results[0].collectionId);
         res.render('users/user-profile', { user: req.session.currentUser, podcasts: allPodcasts })
+        //res.send("Here would be the user profile")
       })
   }
   else {
+    //res.send("Got into the else")
     res.render('users/user-profile', { user: req.session.currentUser })
   }
 

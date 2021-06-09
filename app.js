@@ -117,7 +117,7 @@ const spotify = require("./routes/spotify");
 app.use("/spotify", spotify);
 
 const itunes = require("./routes/itunes");
-app.use("/", itunes);
+app.use("/itunes", itunes);
 
 const podcasts = require("./routes/podcasts");
 app.use("/", podcasts);

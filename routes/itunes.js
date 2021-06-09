@@ -30,7 +30,7 @@ router.get('/itunes', (req, res, next) => {
 
 // iTunes DETAILS page
 
-router.get("/itunes/details/:showId", (req, res) => {
+router.get("/details/:showId", (req, res) => {
   console.log("Show ID: ", req.params.showId)
 
   https.get(`https://itunes.apple.com/lookup?id=${req.params.showId}&entity=podcastEpisode&limit=10`, (resp) => {
@@ -92,118 +92,36 @@ router.get("/itunes/details/:showId", (req, res) => {
 
 // Promise.all([fromItunes, fromDb]).then(values => {
 
+// Add iTunes Podcasts as favorites
 
-// Add episode to bookmarked playlist
-router.post("/listennotes/details/:podcastid/:id/addtoplaylist", (req, res) => {
+router.post('/:id/addtofavorite', (req, res) => {
 
-  if (!req.session.currentUser) {
-
-    const requestedAction = {
-      action: "addtoplaylist",
-      podcastId: req.params.podcastid,
-      episodeId: req.params.id,
-      origin: "listennotes",
-      message: "You need to login to bookmark episodes"
-    }
-
-    req.session.pendingRequest = requestedAction
-
-    res.render("auth/login", { pendingRequest: requestedAction })
-
-  } else {
-
-    actions.addToPlaylistLN(req.params.id, req.session.currentUser._id)
-      .then(() => res.redirect(`/listennotes/details/${req.params.podcastid}`));
-  }
-});
-
-
-// Add Listen Notes Podcasts as favorites
-
-router.post('/listennotes/:id/addtofavorite', (req, res) => {
+  //console.log("USER: ", req.session.currentUser)
 
   if (!req.session.currentUser) {
 
     const requestedAction = {
       action: "addtofavorite",
       podcastId: req.params.id,
-      origin: "listennotes",
+      origin: "itunes",
       message: "You need to login to add a favorite podcast"
     }
 
     req.session.pendingRequest = requestedAction
 
+    console.log("SESSION: ", req.session)
+
     res.render("auth/login", { pendingRequest: requestedAction })
 
   } else {
 
-    actions.addToFavoritesLN(req.params.id, req.session.currentUser._id)
+    actions.addToFavoritesIT(req.params.id, req.session.currentUser._id)
       .then(() => res.redirect("/userProfile"));
 
   }
-
 })
 
-router.post('listennotes/delete/:id', (req, res) => {
-  Podcast.findOne({ podcastId: req.params.id })
-    .then(podcast => {
-      console.log("Podcast we want to delete", podcast)
-      User.findOneAndUpdate({ _id: req.session.currentUser._id }, { $pull: { favoritePodcasts: podcast._id } }, { new: true })
-    })
-  res.redirect("/userProfile");
 
-})
 
-//  *********************COMMENTS SECTION***************************
-
-// Add new comment to a podcast
-router.post('/listennotes/details/:showId/newcomment', (req, res, next) => {
-
-  if (!req.session.currentUser) {
-
-    const requestedAction = {
-      action: "comment",
-      podcastId: req.params.showId,
-      commentContent: req.body.content,
-      origin: "listennotes",
-      message: "You need to login to add a comment"
-    }
-
-    req.session.pendingRequest = requestedAction
-
-    res.render("auth/login", { pendingRequest: requestedAction })
-
-  } else {
-
-    actions.addCommentLN(req.params.showId, req.body.content, req.session.currentUser._id)
-      .then(() => res.redirect(`/listennotes/details/${req.params.showId}`));
-
-  }
-});
-
-// +++++++++++++++++++++++++RATING SECTION++++++++++++++++++++++++++++
-
-router.post('/listennotes/details/:showId/newrating', (req, res, next) => {
-
-  if (!req.session.currentUser) {
-
-    const requestedAction = {
-      action: "rate",
-      podcastId: req.params.showId,
-      ratingContent: req.body.content,
-      origin: "listennotes",
-      message: "You need to login to rate a podcasts"
-    }
-
-    req.session.pendingRequest = requestedAction
-    res.render("auth/login", { pendingRequest: requestedAction })
-
-  } else {
-
-    actions.ratePodcastLN(req.params.showId, req.body.content, req.session.currentUser._id)
-      .then(() => res.redirect(`/listennotes/details/${req.params.showId}`));
-
-  }
-})
 
 module.exports = router;

@@ -13,7 +13,7 @@
       <h6 class='mb-4'>Publisher: {{podcasts.artistName}}
       </h6>
       <h6 class='mb-4'>Number of episodes: {{podcasts.trackCount}}</h6>
-      <form action="/spotify/{{podcasts.collectionId}}/addtofavorite" method="post">
+      <form action="/itunes/{{podcasts.collectionId}}/addtofavorite" method="post">
         <button class="btn btn-outline-secondary btn-lg">Add to favorites</button>
       </form>
     </div>
@@ -112,130 +112,12 @@
       <p class='mb-4' font-weight-light> {{this.description}}</p>
       <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}" target="_blank">Play on
           iTunes</a></p>
-      <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
+      <form action="/itunes/details/{{this.collectionId}}/{{this.trackId}}/addtoplaylist" method="POST">
         <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
       </form>
-      {{!-- <br>
-      <button class="btn btn-outline-secondary btn-sm" type="submit">Add as favorite</button>
-      </br> --}}
     </div>
   </div>
 </div>
 {{/each}}
 
-
-
-
-{{!-- <h5>Last episodes: </h5>
-{{#each podcasts.episodes.items}}
-<li>{{this.name}}</li>
-<img class="podcastDetailImg" src="{{this.images.[1].url}}">
-<p>Release date: {{this.release_date}}</p>
-<p>{{this.description}}</p>
-<p><a href="{{this.external_urls.spotify}}" target="_blank">Play on Spotify</a></p>
-<form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
-  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
-</form>
-{{/each}}
-<button type="submit">Add as favorite</button> --}}
-
-
-
-
-
-
-
-
-
-
-
-{{!-- <div>
-  <h2>{{podcasts.name}}</h2>
-  <img class="podcastImg" src="{{podcasts.images.[1].url}}">
-  <form action="/spotify/{{podcasts.id}}/addtofavorite" method="post">
-    <button class="btn btn-outline-secondary btn-lg">Add to favorites</button>
-  </form>
-
-  <h4>Description</h4>
-  <p>{{podcasts.description}}</p>
-  <h5>Publisher: {{podcasts.publisher}}</h5> --}}
-
-  {{!-- {{#if beingCommentingUser}} --}}
-  {{!-- <form action="/spotify/details/{{podcasts.id}}/newcomment" method="POST"> --}}
-    {{!-- <textarea id="my-textarea"></textarea>
-
-    <input class="btn btn-outline-secondary btn-sm" type="submit" value="Change your comment">
-  </form>
-  {{else}} --}}
-
-  {{!-- {{#if usersCommentToPrint}}
-  <h5>Your Comment:</h5>
-  <p>{{usersCommentToPrint.content}}</p>
-  {{/if}}
-  <form action="/spotify/details/{{podcasts.id}}/newcomment" method="POST">
-
-
-
-    {{#if usersCommentToPrint}}
-    <textarea name="content" id="comment-content" cols="60" rows="1">{{usersCommentToPrint.content}}</textarea>
-    <input class="btn btn-outline-secondary btn-sm" type="submit" value="Edit your comment">
-    {{else}}
-    <textarea name="content" id="comment-content-input" cols="60" rows="1"></textarea>
-    <input class="btn btn-outline-secondary btn-sm" type="submit" value="Comment a Podcast">
-    {{/if}}
-  </form> --}}
-
-
-  {{!-- <form action="/spotify/details/{{podcasts.id}}/newcomment" onsubmit="return getContent()">
-    <textarea id="my-textarea" style="display:none"></textarea>
-    <input type="submit" />
-  </form> --}}
-
-  {{!-- <h5>Comments:</h5>
-
-  {{#each ourpodcasts.comments}}
-  <li>{{this.content}}</li>
-  {{/each}} --}}
-
-  {{!-- *********RATING*********** --}}
-
-  {{!-- <h5>Rating: {{ratingResults}}</h5>
-
-  {{#if usersRatingToPrint}}
-  <h5>Your Rating: {{usersRatingToPrint.content}}</h5>
-  {{/if}}
-  <form id="starButton" action="/spotify/details/{{podcasts.id}}/newrating" method="POST">
-    <textarea type='text' name="content" id="rating-content-input" cols="1" rows="1"></textarea>
-    <div class="rating">
-      <i class="fa fa-star unchecked" id="one" name="content"></i>
-      <i class="fa fa-star unchecked" id="two" name="content"></i>
-      <i class="fa fa-star unchecked" id="three" name="content"></i>
-      <i class="fa fa-star unchecked" id="four" name="content"></i>
-      <i class="fa fa-star unchecked" id="five" name="content"></i>
-    </div>
-  </form> --}}
-
-
-
-
-  {{!-- <h5>Last episodes: </h5>
-  {{#each podcasts.episodes.items}}
-  <li>{{this.name}}</li>
-  <img class="podcastDetailImg" src="{{this.images.[1].url}}">
-  <p>Release date: {{this.release_date}}</p>
-  <p>{{this.description}}</p>
-  <p><a href="{{this.external_urls.spotify}}" target="_blank">Play on Spotify</a></p>
-  <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
-    <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
-  </form>
-  {{/each}}
-  <button type="submit">Add as favorite</button> --}}
-
-
-
-
-
-
-
-
-  <script src="/javascripts/script.js"></script>
+<script src="/javascripts/script.js"></script>

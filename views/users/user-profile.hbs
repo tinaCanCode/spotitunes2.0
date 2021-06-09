@@ -10,13 +10,15 @@
         <p>All your favorite podcasts are here. Check out "My bookmarks" to find the episodes you bookmarked.</p>
       </div>
       {{!-- <div class="row"> --}}
-      {{!-- <div class="col">
+        {{!-- <div class="col">
           <form action="/logout" method="post">
             <button class="btn btn-outline-secondary btn-sm">Logout</button>
           </form>
         </div> --}}
-      <a href="/playlists/bookmarked"><button class="btn btn-lg btn-outline-secondary mt-0 mb-2">My bookmarks</button></a>
-      {{!-- </div> --}}
+        <a href="/playlists/bookmarked"><button class="btn btn-lg btn-outline-secondary mt-0 mb-2">My
+            bookmarks</button></a>
+        {{!--
+      </div> --}}
       <hr class="my-4 wow">
     </div>
 
@@ -29,23 +31,29 @@
 
     {{#each podcasts}}
 
-    {{#if this.body.listennotes_url}}
+    {{#if this.data.results}}
+
+    {{#each this.data.results}}
 
     <div class='col-md-3'>
       <div class='card'>
-        <a href="/listennotes/details/{{this.body.id}}"> <img class="card-img-top" src="{{this.body.thumbnail}}">
+        <a href="/itunes/details/{{this.collectionId}}"> <img class="card-img-top"
+            src="{{this.artworkUrl600}}">
         </a>
         <div class='card-body'>
-          <h4 class="podcast-title">{{this.body.title}}</h4>
-          <p>{{this.body.publisher}}</p>
-          <a href="/listennotes/details/{{this.body.id}}"><button class="btn btn-outline-secondary btn-sm">Show Details</button></a>
-          <form action="/delete/{{this.body.id}}" method="POST">
-            <button class="btn mt-2 btn-sm btn-remove">Remove</button>
+          <h4 class="podcast-title">{{this.collectionName}}</h4>
+          <p>{{this.artistName}}</p>
+          <button class="btn btn-outline-secondary btn-sm">
+            <a href="/itunes/details/{{this.collectionId}}">Show Details</a>
+          </button>
+          <form action="/delete/{{this.collectionId}}" method="POST">
+            <button class="btn btn-danger btn-sm m-2">Remove from favorites</button>
           </form>
         </div>
       </div>
     </div>
 
+    {{/each}}
 
     {{else}}
 
@@ -60,11 +68,12 @@
             <a href="/spotify/details/{{this.body.id}}">Show Details</a>
           </button>
           <form action="/delete/{{this.body.id}}" method="POST">
-            <button class="btn mt-2 btn-sm btn-remove">Remove</button>
+            <button class="btn btn-danger btn-sm m-2">Remove from favorites</button>
           </form>
         </div>
       </div>
     </div>
+
 
 
     {{/if}}
