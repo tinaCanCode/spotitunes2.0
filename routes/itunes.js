@@ -34,24 +34,20 @@ router.get("/details/:showId", (req, res) => {
   console.log("Show ID: ", req.params.showId)
 
   https.get(`https://itunes.apple.com/lookup?id=${req.params.showId}&entity=podcastEpisode&limit=10`, (resp) => {
-    console.log('Status Code', res.statusCode);
+    //console.log('Status Code', res.statusCode);
     let str = '';
     resp.on('data', (d) => {
-      process.stdout.write(d);
+      //process.stdout.write(d);
       str += d;
     })
     resp.on('end', () => {
       let fromItunes = JSON.parse(str)
-      console.log("From iTunes: ", fromItunes)
-      
+      //console.log("From iTunes: ", fromItunes)
       let episodes = fromItunes.results.slice()
       episodes.shift()
-      console.log("Episodes: ", episodes)
+      //console.log("Episodes: ", episodes)
 
-
-      res.render("itunes/details", {
-        podcasts: fromItunes.results[0], episodes: episodes
-      })
+      res.render("itunes/details", { podcasts: fromItunes.results[0], episodes: episodes })
 
     })
 
@@ -121,6 +117,29 @@ router.post('/:id/addtofavorite', (req, res) => {
   }
 })
 
+//addtoplaylist
+router.post("/details/:podcastid/:id/addtoplaylist", (req, res) => {
+
+  if (!req.session.currentUser) {
+
+    const requestedAction = {
+      action: "addtoplaylist",
+      podcastId: req.params.podcastid,
+      episodeId: req.params.id,
+      origin: "itunes",
+      message: "You need to login to bookmark episodes"
+    }
+
+    req.session.pendingRequest = requestedAction
+
+    res.render("auth/login", { pendingRequest: requestedAction })
+
+  } else {
+
+    actions.addToPlaylistIT(req.params.podcastid, req.params.id, req.session.currentUser._id)
+      .then(() => res.redirect(`/itunes/details/${req.params.podcastid}`));
+  }
+});
 
 
 

@@ -8,9 +8,6 @@ const saltRounds = 10;
 const bcryptjs = require('bcryptjs');
 const mongoose = require('mongoose');
 const Podcast = require('../models/Podcast');
-const unirest = require('unirest');
-
-//require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
 const { findById } = require('../models/Podcast');
 const actions = require('../modules/actions');
@@ -103,8 +100,6 @@ router.post('/signup', (req, res) => {
       }
     });
 });
-
-// router.get('/userProfile', (req, res) => res.render('users/user-profile'));
 
 //////////// L O G I N ///////////
 
@@ -230,40 +225,30 @@ router.get('/userProfile', (req, res) => {
     User.findOne({ _id: req.session.currentUser._id })
       .then(user => {
         const podcastDbIds = user.favoritePodcasts
-        console.log("DatabaseIDs: ", podcastDbIds)
+        //console.log("DatabaseIDs: ", podcastDbIds)
         return Promise.all(podcastDbIds.map(async (id) => {
           return await Podcast.findOne({ _id: id })
         }))
       }).then(podcasts => {
-        console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
+        //console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
         return Promise.all(podcasts.map(async (podcast) => {
-          console.log("Podcast ID", podcast.podcastId)
+          //console.log("Podcast ID", podcast.podcastId)
           if (podcast.origin === "spotify") {
             return await spotifyApi.getShow(podcast.podcastId, { market: "DE" });
           }
           else if (podcast.origin === "itunes") {
-            return actions.lookupPodcastId(podcast.podcastId);
+            return await actions.lookupPodcastId(podcast.podcastId);
           }
-          //remove
-          else if (podcast.origin === "listennotes") {
-            const lnResponse = await unirest.get(`https://listen-api.listennotes.com/api/v2/podcasts/${podcast.podcastId}?sort=recent_first`)
-            .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
-            return lnResponse.toJSON();
-          }
-          //console.log("Response from itunes in auth.js: ", itunesResponse)
+  
         }))
-        // console.log("PodcastDetails: ", podcastDetails)
-        // return podcastDetails
       })
       .then(allPodcasts => {
         //console.log("All podcasts :", allPodcasts)
         //console.log("iTunes response in auth: ", allPodcasts[1].data.results[0].collectionId);
         res.render('users/user-profile', { user: req.session.currentUser, podcasts: allPodcasts })
-        //res.send("Here would be the user profile")
       })
   }
   else {
-    //res.send("Got into the else")
     res.render('users/user-profile', { user: req.session.currentUser })
   }
 

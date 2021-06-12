@@ -188,6 +188,25 @@ module.exports = {
       })
   },
 
+  addToPlaylistIT(podcastId, episodeId, userId) {
+
+    return axios.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`)
+      .then((resp) => {
+        console.log("Here is the episode response from axios: ", resp.data)
+        let allEpisodes = resp.data.results
+
+        console.log("PodcastID ", podcastId)
+        console.log("episodeID ", episodeId)
+        
+        const episodeToBookmark = allEpisodes.filter(episode => episode.trackId === Number(episodeId))
+        console.log("espisode to bookmark: ", episodeToBookmark)
+
+        return Playlist.findOneAndUpdate(
+          { $and: [{ ownerID: userId }, { playlistName: "Bookmarked" }] },
+          { $push: { episodes: { podcastId: episodeToBookmark[0].collectionId, episodeID: episodeToBookmark[0].trackId, source: "itunes" } } })
+      })
+  },
+
   //Actions for LN (remove)
 
   addToFavoritesLN(podcastId, userId) {

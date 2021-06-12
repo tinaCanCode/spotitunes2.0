@@ -35,7 +35,6 @@ router.get('/search-results', (req, res) => {
 
   Promise.all([itunesSearch, spotifySearch]).then((response) => {
     //console.log("THIS IS THE SEARCH RESULT: " + response);
-    //console.log("THIS IS THE SEARCH RESULT NUMBER 1 LN: " + response[0].toJSON().body.results[0]);
     //console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
     //console.log("THIS IS THE SEARCH RESULT FOR ITUNES: ", response[0]);
 
@@ -57,7 +56,7 @@ router.get('/search-results', (req, res) => {
       allResults.push(resultSummary)
     }
 
-    // Create smaller and uniformised Spotify podcasts object
+    // Create smaller and uniformised spotify podcasts object
     for (let i = 0; i < spotifyResults.length; i++) {
       let resultSummary = {
         id: spotifyResults[i].id,

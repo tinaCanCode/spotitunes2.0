@@ -7,7 +7,7 @@ const saltRounds = 10;
 const bcryptjs = require('bcryptjs');
 const mongoose = require('mongoose');
 const Podcast = require('../models/Podcast');
-const unirest = require('unirest');
+const axios = require('axios');
 
 //require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -47,40 +47,44 @@ router.get('/playlists/:name', (req, res) => {
         id: currentPlaylist._id
       }
       let requestPromises = []
-    //  console.log("THIS IS THE PLAYLIST: " + playlistsAll)
+      console.log("THIS IS THE PLAYLIST: " + playlistsAll)
       for (let i = 0; i < currentPlaylist.episodes.length; i++) {
-        if (currentPlaylist.episodes[i].source === "listennotes") {
-          let request = unirest.get(`https://listen-api.listennotes.com/api/v2/episodes/${currentPlaylist.episodes[i].episodeID}`)
-            .header('X-ListenAPI-Key', process.env.LISTENNOTES_APIKEY)
-            .then((episode) => {
-              // WORKS console.log("THIS IS THE EPiSODE : " + episode.body.title)
+        if (currentPlaylist.episodes[i].source === "itunes") {
+          console.log("IT Episode ID ", currentPlaylist.episodes[i].episodeID)
+          let request = axios.get(`https://itunes.apple.com/lookup?id=${currentPlaylist.episodes[i].podcastId}&entity=podcastEpisode`)
+            .then((resp) => {
+
+              let allEpisodes = resp.data.results
+              const bookmarkedEpisode = allEpisodes.filter(episode => episode.trackId === Number(currentPlaylist.episodes[i].episodeID))
+
+              console.log("THIS IS THE IT EPiSODE : " + bookmarkedEpisode[0].trackName)
+
               let episodeSummary = {
-                id: episode.body.id,
-                title: episode.body.title,
-                link: episode.body.link,
-                podcast: episode.body.title,
-                podcastID: episode.body.podcast.id,
-                source : "listennotes"
+                id: bookmarkedEpisode[0].trackId,
+                title: bookmarkedEpisode[0].trackName,
+                link: bookmarkedEpisode[0].trackViewUrl,
+                podcast: bookmarkedEpisode[0].collectionName,
+                podcastID: bookmarkedEpisode[0].collectionId,
+                source: "itunes"
               }
               playlistEpisodes.push(episodeSummary)
               //console.log("THIS IS THE PLAYLIST if : " + playlistEpisodes)
 
             })
           requestPromises.push(request)
-
         }
         else if (currentPlaylist.episodes[i].source === "spotify") {
           let request = spotifyApi
             .getEpisode(currentPlaylist.episodes[i].episodeID, { market: "DE" })
             .then((episode) => {
-              // WORKS console.log("THIS IS THE EPiSODE : " + episode.body.name)
+              console.log("THIS IS THE SP EPiSODE : " + episode.body.name)
               let episodeSummary = {
                 id: episode.body.id,
                 title: episode.body.name,
                 link: episode.body.external_urls.spotify,
                 podcast: episode.body.show.name,
                 podcastID: episode.body.show.id,
-                source : "spotify"
+                source: "spotify"
               }
               //WORKS console.log("THIS is THE EPOSIODE :" + episodeSummary.id)
               playlistEpisodes.push(episodeSummary)
@@ -114,7 +118,7 @@ router.get("/bookmarks/new", (req, res) => {
 })
 
 router.post("/bookmarks/new", (req, res) => {
-  Playlist.create({ ownerID: req.session.currentUser._id, userName: req.session.currentUser.username, playlistName: req.body.playlistname, default : false })
+  Playlist.create({ ownerID: req.session.currentUser._id, userName: req.session.currentUser.username, playlistName: req.body.playlistname, default: false })
     .then(() => {
       res.redirect('/playlists/bookmarked')
     })
@@ -124,13 +128,13 @@ router.post("/bookmarks/:source/:episodeID", (req, res) => {
   console.log("2CHECKTHID OUTTOTUTOUT" + req.body.source)
   let addTo = Playlist.findOneAndUpdate(
     { $and: [{ ownerID: req.session.currentUser._id }, { playlistName: req.body.selectpicker }] },
-    { $push: { episodes: { episodeID: req.params.episodeID, source : req.params.source } } })
+    { $push: { episodes: { episodeID: req.params.episodeID, source: req.params.source } } })
 
 
   let deleteFrom =
     Playlist.findOneAndUpdate(
       { $and: [{ ownerID: req.session.currentUser._id }, { playlistName: "Bookmarked" }] },
-      { $pull: { episodes: { episodeID: req.params.episodeID} } })
+      { $pull: { episodes: { episodeID: req.params.episodeID } } })
 
   Promise.all([addTo, deleteFrom]).then((response) => {
     res.redirect('/playlists/bookmarked')
@@ -141,13 +145,13 @@ router.get("/playlist/:name/edit", (req, res) => {
   Playlist.find({ ownerID: req.session.currentUser._id })
     .then((playlists) => {
       let currentPLaylist = playlists.find(playlist => playlist.playlistName.toLowerCase() == req.params.name.toLowerCase())
-      res.render("users/editplaylist", {playlist : currentPLaylist})
-})
+      res.render("users/editplaylist", { playlist: currentPLaylist })
+    })
 })
 
 router.post("/playlist/:id/edit", (req, res) => {
   Playlist.findOneAndUpdate(
-    { _id: req.params.id},
+    { _id: req.params.id },
     { playlistName: req.body.playlistname })
     .then((playlist) => {
       console.log("CHECK THISO OUT" + playlist)

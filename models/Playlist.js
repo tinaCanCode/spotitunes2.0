@@ -7,6 +7,7 @@ const playlistSchema = new Schema({
   playlistName : String,
   episodes: [{
     episodeID : String,
+    podcastId: String,
     source : String
   }],
   default : Boolean
