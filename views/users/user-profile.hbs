@@ -9,16 +9,12 @@
         <h2 class='bookmarked'>Hey, {{ user.username }}. </h2>
         <p>All your favorite podcasts are here. Check out "My bookmarks" to find the episodes you bookmarked.</p>
       </div>
-      {{!-- <div class="row"> --}}
-        {{!-- <div class="col">
-          <form action="/logout" method="post">
-            <button class="btn btn-outline-secondary btn-sm">Logout</button>
-          </form>
-        </div> --}}
-        <a href="/playlists/bookmarked"><button class="btn btn-lg btn-outline-secondary mt-0 mb-2">My
-            bookmarks</button></a>
-        {{!--
-      </div> --}}
+      <div>
+        <a href="/playlists/bookmarked"><button class="btn btn-lg btn-outline-secondary mt-0 mb-2">My bookmarks</button></a>
+      </div>
+      <div>
+        <a href="/userProfile/episodes"><button class="btn btn-lg btn-outline-secondary mt-0 mb-2">Latest episodes</button></a>
+      </div>
       <hr class="my-4 wow">
     </div>
 
@@ -37,8 +33,7 @@
 
     <div class='col-md-3'>
       <div class='card'>
-        <a href="/itunes/details/{{this.collectionId}}"> <img class="card-img-top"
-            src="{{this.artworkUrl600}}">
+        <a href="/itunes/details/{{this.collectionId}}"> <img class="card-img-top" src="{{this.artworkUrl600}}">
         </a>
         <div class='card-body'>
           <h4 class="podcast-title">{{this.collectionName}}</h4>

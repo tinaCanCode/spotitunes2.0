@@ -149,27 +149,15 @@ module.exports = {
 
   async lookupPodcastId(podcastId) {
 
-    // Option 1 with node https request
-    // https.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcast`, (resp) => {
-    //   //console.log('Status Code', res.statusCode);
-    //   let str = '';
-    //   resp.on('data', (d) => {
-    //     process.stdout.write(d);
-    //     str += d;
-    //   })
-    //   resp.on('end', () => {
-    //     let fromItunes = JSON.parse(str)
-    //     console.log("Action: Response From iTunes: ", fromItunes)
-    //     // Add code to send data where the function is used
-    //   })
-    // })
-
-    // Option 2 with axios
     return await axios.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcast`)
 
   },
 
+  async lookupPodcastEpisodes(podcastId) {
+    
+    return await axios.get(`https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`)
 
+  },
 
   addToFavoritesIT(podcastId, userId) {
     return Podcast.exists({ podcastId: podcastId })

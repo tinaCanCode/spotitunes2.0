@@ -251,6 +251,75 @@ router.get('/userProfile', (req, res) => {
   else {
     res.render('users/user-profile', { user: req.session.currentUser })
   }
+});
+
+  router.get('/userProfile/episodes', (req, res) => {
+    //console.log(req.session.currentUser)
+    console.log("Calling the user profile episodes GET route")
+    if (req.session.currentUser.favoritePodcasts !== null) {
+  
+      User.findOne({ _id: req.session.currentUser._id })
+        .then(user => {
+          const podcastDbIds = user.favoritePodcasts
+          //console.log("DatabaseIDs: ", podcastDbIds)
+          return Promise.all(podcastDbIds.map(async (id) => {
+            return await Podcast.findOne({ _id: id })
+          }))
+        }).then(podcasts => {
+          console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
+          return Promise.all(podcasts.map(async (podcast) => {
+            //console.log("Podcast ID", podcast.podcastId)
+            if (podcast.origin === "spotify") {
+              return await spotifyApi.getShow(podcast.podcastId, { market: "DE" });
+            }
+            else if (podcast.origin === "itunes") {
+              return await actions.lookupPodcastEpisodes(podcast.podcastId);
+            }
+    
+          }))
+        })
+        .then(allPodcasts => {
+          //console.log("All podcasts :", allPodcasts)
+          let today = new Date().getTime()
+          //console.log(today)
+
+          let allEpisodes = []
+          
+          allPodcasts.forEach(podcast => {
+            if(podcast.body && podcast.body.episodes) {
+
+              //console.log(releaseDate)
+              let latestEpisodes = podcast.body.episodes.items.filter(episode => {
+                let releaseDate = new Date(episode.release_date).getTime()
+                let daysElapsed = (today-releaseDate) / 86400000
+                return daysElapsed < 30
+              })
+              latestEpisodes.forEach(episode => {
+                allEpisodes.push(episode)
+              })
+            }
+            else {
+              let episodes = podcast.data.results
+              episodes.shift()
+              let latestEpisodes = episodes.filter(episode => {
+                let releaseDate = new Date(episode.releaseDate).getTime()
+                let daysElapsed = (today-releaseDate) / 86400000
+                return daysElapsed < 10
+              })
+              latestEpisodes.forEach(episode => {
+                allEpisodes.push(episode)
+              })
+            }
+          })
+          console.log("All Episodes: ", allEpisodes)
+          
+          res.render('users/episodes', { user: req.session.currentUser, episodes: allEpisodes })
+        })
+        
+    }
+    else {
+      res.render('users/user-profile', { user: req.session.currentUser })
+    }
 
 });
 

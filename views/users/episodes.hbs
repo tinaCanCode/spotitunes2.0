@@ -1,0 +1,72 @@
+{{> navbar }}
+{{!-- <div class="playlist-box container col vertical-center"> --}}
+  <div class="container col vertical-center">
+
+    {{!-- <div class="container"> --}}
+      <div class='col-12 text-center mt-5'>
+        <div class="list-title vertical-center">
+          {{!-- <div class="list-title vertical-center"> --}}
+            <h2><a class='bookmarked' href="/playlists/bookmarked">Latest Episodes</a></h2>
+            <h4 class='bookmarked'>Episodes from my favorite podcasts</h4>
+            <h6 class='mt-4'> Have an overview of your favorite Podcasts' latest episodes.
+            </h6>
+          </div>
+
+          <div class="playlist-box container col vertical-center">
+            <a href="/search"><button class="btn mt-4 px-2 btn-md btn-outline-secondary col vertical-center"
+                title="search podcasts">Search and bookmark</button></a>
+            <a href="/userProfile"><button class="btn mt-4 px-2 btn-md btn-remove col vertical-center"
+                title="back to favorites">Back to Favorite Podcasts</button></a>
+          </div>
+
+          <hr class="mb-3">
+
+          <h4 class="text-center">Latest Episodes</h4>
+          <hr class="mb-3">
+
+          {{#each episodes}}
+
+          {{#if this.external_urls.spotify}}
+          <div class='container my-5'>
+            <div class='row py-4'>
+              <div class='col-lg-4'>
+                <img class="w-100 podcastImg" src="{{this.images.[0].url}}">
+              </div>
+              <div class='col-lg-8 mb-4 my-lg-auto'>
+                <h4 class='text-bright font-weight-bold mb-3'>{{this.name}}</h4>
+                {{!-- <p class='mb-4'>Release date: {{this.release_date}} </p> --}}
+                <p class='mb-4' font-weight-light> {{this.description}}</p>
+                <p><a class="btn btn-outline-secondary btn-sm" href="{{this.external_urls.spotify}}"
+                    target="_blank">Listen now</a></p>
+                <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
+                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark">
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {{else}}
+          <div class='container my-5'>
+            <div class='row py-4'>
+              <div class='col-lg-4'>
+                <img class="w-100 podcastImg" src="{{this.artworkUrl600}}">
+              </div>
+              <div class='col-lg-8 mb-4 my-lg-auto'>
+                <h4 class='text-bright font-weight-bold mb-3'>{{this.trackName}}</h4>
+                {{!-- <p class='mb-4'>Release date: {{this.release_date}} </p> --}}
+                <p class='mb-4' font-weight-light> {{this.collectionName}}</p>
+                <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}"
+                    target="_blank">Listen now</a></p>
+                <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
+                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark">
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {{/if}}
+          <hr class="mb-3">
+          {{/each}}
+        </div>
+      </div>
+    </div>
