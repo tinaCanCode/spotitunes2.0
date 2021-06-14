@@ -27,74 +27,10 @@
 
 <hr class="hr-light m-4 wow fadeInDown ">
 
-{{!-- Comments --}}
-<div class='container my-5'>
-  <div class='row py-4'>
-
-
-
-
-    <div class='col-lg-6 text-center mt-3 my-lg-auto'>
-      {{#if usersCommentToPrint}}
-      <h3 class='pt-4'>Your Comment:</h3>
-      <p>{{usersCommentToPrint.content}}</p>
-      {{/if}}
-      <form action="/spotify/details/{{podcasts.id}}/newcomment" method="POST">
-
-
-
-        {{#if usersCommentToPrint}}
-        <textarea name="content" id="comment-content" cols="30" rows="1">{{usersCommentToPrint.content}}</textarea><br>
-        <input class="btn btn-outline-secondary btn-sm" type="submit" value="Edit your comment">
-        </br>
-        {{else}}
-        <textarea name="content" id="comment-content-input" cols="30" rows="2"></textarea><br>
-        <input class="btn btn-outline-secondary btn-sm" type="submit" value="Comment this Podcast">
-        </br>
-        {{/if}}
-      </form>
-
-      <h3 class='pt-4'>Comments:</h3>
-      {{#each ourpodcasts.comments}}
-      <p class='pt-4'>"{{this.content}}"</p>
-      {{/each}}
-
-    </div>
-
-
-    {{!-- Rating --}}
-    <div class='col-lg-6 text-center mt-3'>
-      <h3 class='pt-4'>Rating: {{ratingResults}}</h3>
-
-      {{#if usersRatingToPrint}}
-      <p class='pt-4'>Your Rating: {{usersRatingToPrint.content}}</p>
-      {{else}}
-      <p class="pt-4">Rate this Podcast</p>
-      {{/if}}
-      <form id="starButton" action="/spotify/details/{{podcasts.id}}/newrating" method="POST">
-        <textarea type='text' name="content" id="rating-content-input" cols="1" rows="1"></textarea>
-        <div class="rating">
-          <i class="fa fa-star unchecked" id="one" name="content"></i>
-          <i class="fa fa-star unchecked" id="two" name="content"></i>
-          <i class="fa fa-star unchecked" id="three" name="content"></i>
-          <i class="fa fa-star unchecked" id="four" name="content"></i>
-          <i class="fa fa-star unchecked" id="five" name="content"></i>
-        </div>
-      </form>
-
-    </div>
-
-
-  </div>
-</div>
-
-{{!-- Last Episodes --}}
-
-
+{{!-- Latest Episodes --}}
 <div class='col-12 text-center mt-5'>
   <hr class="hr-light my-4 wow fadeInDown">
   <h1 class='pt-4'>Latest Episodes</h1>
-
 </div>
 
 {{#each episodes}}
