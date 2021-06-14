@@ -46,8 +46,7 @@
 
       <p class='mb-4'>Release date: {{this.releaseDate}} </p>
       <p class='mb-4' font-weight-light> {{this.description}}</p>
-      <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}" target="_blank">Play on
-          iTunes</a></p>
+      <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}" target="_blank">Listen now</a></p>
       <form action="/itunes/details/{{this.collectionId}}/{{this.trackId}}/addtoplaylist" method="POST">
         <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
       </form>

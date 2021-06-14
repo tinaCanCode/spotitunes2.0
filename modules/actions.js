@@ -19,6 +19,8 @@ spotifyApi
   .catch(error => console.log('Something went wrong when retrieving an access token', error));
 
 
+// Clean actions from Actions for Listennotes
+
 module.exports = {
 
   // Actions for spotify

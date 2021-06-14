@@ -20,15 +20,13 @@
     "express": "^4.16.3",
     "express-session": "^1.17.1",
     "hbs": "^4.0.1",
-    "itunes-web-api": "^1.0.7",
     "jsdom": "^16.4.0",
     "mocha": "^8.2.1",
     "mongoose": "^5.2.10",
     "morgan": "^1.9.0",
     "node-sass-middleware": "^0.11.0",
     "serve-favicon": "^2.5.0",
-    "spotify-web-api-node": "^5.0.2",
-    "unirest": "^0.6.0"
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"

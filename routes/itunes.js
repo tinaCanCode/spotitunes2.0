@@ -1,32 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const unirest = require('unirest');
 const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
 const Playlist = require('../models/Playlist');
 const actions = require('../modules/actions');
 const { default: Axios } = require('axios');
-const itunes = require('itunes-web-api')
 const https = require('https');
 
 /* GET itunes search page */
 router.get('/itunes', (req, res, next) => {
   res.render('itunes/search');
 });
-
-
-//GET itunes results page --> obsolete since integration with search in podcast.js
-// router.get('/itunes/search-results', (req, res, next) => {
-//   console.log("HERE IS THE QUERY to iTunes: " + req.query.podcast)
-
-//   itunes.podcast(req.query.podcast, { limit: 20 }).then(data => {
-//     console.log("Response from itunes", data) //podcast info in results array
-//     res.render('itunes/search-results', { searchResults: data.results })
-//   }).catch(error => {
-//     res.render('itunes/search-results')
-//   })
-// })
 
 // iTunes DETAILS page
 
@@ -47,31 +32,11 @@ router.get("/details/:showId", (req, res) => {
       episodes.shift()
       //console.log("Episodes: ", episodes)
 
-      res.render("itunes/details", { podcasts: fromItunes.results[0], episodes: episodes })
+      res.render("itunes/details", { podcasts: fromItunes.results[0], episodes: episodes, user: req.session.currentUser })
 
     })
 
   })
-
-  // https.get(`https://itunes.apple.com/lookup?id=${req.params.showId}&entity=podcastEpisode&limit=10`, (resp) => {
-  //   console.log('Status Code', res.statusCode);
-  //   let str = '';
-  //   resp.on('data', (d) => {
-  //     process.stdout.write(d);
-  //     str += d;
-  //   })
-  //   resp.on('end', () => {
-  //     let episodesFromItunes = JSON.parse(str)
-  //     console.log("Episodes From iTunes: ", episodesFromItunes)
-  //     // res.render("itunes/details", {
-  //     //   podcasts: fromItunes.results[0]
-  //     // })
-
-  //   })
-
- // })
-
-
 
 })
 

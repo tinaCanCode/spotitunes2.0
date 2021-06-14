@@ -1,14 +1,13 @@
-
 // const { Router } = require('express');
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User')
 const Playlist = require('../models/Playlist')
-const saltRounds = 10;
-const bcryptjs = require('bcryptjs');
 const mongoose = require('mongoose');
 const Podcast = require('../models/Podcast');
 const SpotifyWebApi = require('spotify-web-api-node');
+const saltRounds = 10;
+const bcryptjs = require('bcryptjs');
 const { findById } = require('../models/Podcast');
 const actions = require('../modules/actions');
 
@@ -40,13 +39,13 @@ router.post('/signup', (req, res) => {
   if (!username || !email || !password || !repeatpassword) {
     let preusername = username
     let preemail = email
-    res.render('auth/signup', { errorMessage: 'All fields are mandatory. Please provide your username, email and password.', preusername: preusername, preemail:preemail});
+    res.render('auth/signup', { errorMessage: 'All fields are mandatory. Please provide your username, email and password.', preusername: preusername, preemail: preemail });
     return;
   }
   else if (password != repeatpassword) {
     let preusername = username
     let preemail = email
-    res.render('auth/signup', { errorMessage: 'The repeated password is not the same. Provide the password one more time', preusername: preusername, preemail:preemail });
+    res.render('auth/signup', { errorMessage: 'The repeated password is not the same. Provide the password one more time', preusername: preusername, preemail: preemail });
     return;
   }
 
@@ -58,7 +57,7 @@ router.post('/signup', (req, res) => {
     let preemail = email
     res
       .status(500)
-      .render('auth/signup', { errorMessage: 'Password needs to have at least 6 chars and must contain at least one number, one lowercase and one uppercase letter.' , preusername: preusername, preemail:preemail});
+      .render('auth/signup', { errorMessage: 'Password needs to have at least 6 chars and must contain at least one number, one lowercase and one uppercase letter.', preusername: preusername, preemail: preemail });
     return;
   }
 
@@ -81,7 +80,7 @@ router.post('/signup', (req, res) => {
         userName: createdUser.username,
         playlistName: "Bookmarked",
         episodes: [],
-        default : true
+        default: true
       })
     })
     .then(() => {
@@ -114,7 +113,7 @@ router.post('/login', (req, res, next) => {
   if (email === '' || password === '') {
     let preemaillog = email
     res.render('auth/login', {
-      errorMessage: 'Please enter both, email and password to login.', preemaillog:preemaillog
+      errorMessage: 'Please enter both, email and password to login.', preemaillog: preemaillog
     });
     return;
   }
@@ -123,7 +122,7 @@ router.post('/login', (req, res, next) => {
     .then(user => {
       if (!user) {
         let preemaillog = email
-        res.render('auth/login', { errorMessage: 'Email is not registered. Try with other email.', preemaillog:preemaillog});
+        res.render('auth/login', { errorMessage: 'Email is not registered. Try with other email.', preemaillog: preemaillog });
         return;
       } else if (bcryptjs.compareSync(password, user.password)) {
         //res.render("users/user-profile", {user});
@@ -239,7 +238,7 @@ router.get('/userProfile', (req, res) => {
           else if (podcast.origin === "itunes") {
             return await actions.lookupPodcastId(podcast.podcastId);
           }
-  
+
         }))
       })
       .then(allPodcasts => {
@@ -253,73 +252,73 @@ router.get('/userProfile', (req, res) => {
   }
 });
 
-  router.get('/userProfile/episodes', (req, res) => {
-    //console.log(req.session.currentUser)
-    console.log("Calling the user profile episodes GET route")
-    if (req.session.currentUser.favoritePodcasts !== null) {
-  
-      User.findOne({ _id: req.session.currentUser._id })
-        .then(user => {
-          const podcastDbIds = user.favoritePodcasts
-          //console.log("DatabaseIDs: ", podcastDbIds)
-          return Promise.all(podcastDbIds.map(async (id) => {
-            return await Podcast.findOne({ _id: id })
-          }))
-        }).then(podcasts => {
-          console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
-          return Promise.all(podcasts.map(async (podcast) => {
-            //console.log("Podcast ID", podcast.podcastId)
-            if (podcast.origin === "spotify") {
-              return await spotifyApi.getShow(podcast.podcastId, { market: "DE" });
-            }
-            else if (podcast.origin === "itunes") {
-              return await actions.lookupPodcastEpisodes(podcast.podcastId);
-            }
-    
-          }))
-        })
-        .then(allPodcasts => {
-          //console.log("All podcasts :", allPodcasts)
-          let today = new Date().getTime()
-          //console.log(today)
+router.get('/userProfile/episodes', (req, res) => {
+  //console.log(req.session.currentUser)
+  console.log("Calling the user profile episodes GET route")
+  if (req.session.currentUser.favoritePodcasts !== null) {
 
-          let allEpisodes = []
-          
-          allPodcasts.forEach(podcast => {
-            if(podcast.body && podcast.body.episodes) {
+    User.findOne({ _id: req.session.currentUser._id })
+      .then(user => {
+        const podcastDbIds = user.favoritePodcasts
+        //console.log("DatabaseIDs: ", podcastDbIds)
+        return Promise.all(podcastDbIds.map(async (id) => {
+          return await Podcast.findOne({ _id: id })
+        }))
+      }).then(podcasts => {
+        console.log("After map: ", podcasts) // Array of podcast objects in Mongobd incl. origin
+        return Promise.all(podcasts.map(async (podcast) => {
+          //console.log("Podcast ID", podcast.podcastId)
+          if (podcast.origin === "spotify") {
+            return await spotifyApi.getShow(podcast.podcastId, { market: "DE" });
+          }
+          else if (podcast.origin === "itunes") {
+            return await actions.lookupPodcastEpisodes(podcast.podcastId);
+          }
 
-              //console.log(releaseDate)
-              let latestEpisodes = podcast.body.episodes.items.filter(episode => {
-                let releaseDate = new Date(episode.release_date).getTime()
-                let daysElapsed = (today-releaseDate) / 86400000
-                return daysElapsed < 30
-              })
-              latestEpisodes.forEach(episode => {
-                allEpisodes.push(episode)
-              })
-            }
-            else {
-              let episodes = podcast.data.results
-              episodes.shift()
-              let latestEpisodes = episodes.filter(episode => {
-                let releaseDate = new Date(episode.releaseDate).getTime()
-                let daysElapsed = (today-releaseDate) / 86400000
-                return daysElapsed < 10
-              })
-              latestEpisodes.forEach(episode => {
-                allEpisodes.push(episode)
-              })
-            }
-          })
-          console.log("All Episodes: ", allEpisodes)
-          
-          res.render('users/episodes', { user: req.session.currentUser, episodes: allEpisodes })
+        }))
+      })
+      .then(allPodcasts => {
+        //console.log("All podcasts :", allPodcasts)
+        let today = new Date().getTime()
+        //console.log(today)
+
+        let allEpisodes = []
+
+        allPodcasts.forEach(podcast => {
+          if (podcast.body && podcast.body.episodes) {
+
+            //console.log(releaseDate)
+            let latestEpisodes = podcast.body.episodes.items.filter(episode => {
+              let releaseDate = new Date(episode.release_date).getTime()
+              let daysElapsed = (today - releaseDate) / 86400000
+              return daysElapsed < 30
+            })
+            latestEpisodes.forEach(episode => {
+              allEpisodes.push(episode)
+            })
+          }
+          else {
+            let episodes = podcast.data.results
+            episodes.shift()
+            let latestEpisodes = episodes.filter(episode => {
+              let releaseDate = new Date(episode.releaseDate).getTime()
+              let daysElapsed = (today - releaseDate) / 86400000
+              return daysElapsed < 10
+            })
+            latestEpisodes.forEach(episode => {
+              allEpisodes.push(episode)
+            })
+          }
         })
-        
-    }
-    else {
-      res.render('users/user-profile', { user: req.session.currentUser })
-    }
+        console.log("All Episodes: ", allEpisodes)
+
+        res.render('users/episodes', { user: req.session.currentUser, episodes: allEpisodes })
+      })
+
+  }
+  else {
+    res.render('users/user-profile', { user: req.session.currentUser })
+  }
 
 });
 

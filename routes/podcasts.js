@@ -4,6 +4,7 @@ const itunesApi = require('itunes-web-api')
 const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
+const axios = require('axios');
 
 // same code in auth.js --> Can this duplication be removed?
 //require spotify Web api
@@ -30,17 +31,18 @@ router.get('/search', (req, res, next) => {
 router.get('/search-results', (req, res) => {
   //console.log("HERE IS THE QUERY: " + req.query.podcast)
 
-  const itunesSearch = itunesApi.podcast(req.query.podcast, { limit: 6 })
+  //const itunesSearch = itunesApi.podcast(req.query.podcast, { limit: 6 })
+  const itunesSearch = axios.get(`https://itunes.apple.com/search?term=${req.query.podcast}&entity=podcast&limit=6`)
   const spotifySearch = spotifyApi.searchShows(req.query.podcast, { market: "DE", limit: 6 })
 
   Promise.all([itunesSearch, spotifySearch]).then((response) => {
-    //console.log("THIS IS THE SEARCH RESULT: " + response);
-    //console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
-    //console.log("THIS IS THE SEARCH RESULT FOR ITUNES: ", response[0]);
+    // console.log("THIS IS THE SEARCH RESULT: " + response);
+    // console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
+    // console.log("THIS IS THE SEARCH RESULT FOR ITUNES: ", response[0]);
 
     // Values stored into variables
     let allResults = []
-    let itunesResults = response[0].results
+    let itunesResults = response[0].data.results
     let spotifyResults = response[1].body.shows.items
 
     //Create smaller and uniformised itunes podcasts object

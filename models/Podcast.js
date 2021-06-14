@@ -5,6 +5,7 @@ const podcastSchema = new Schema({
     title: String,
     description: String,
     podcastId: { type: String, unique: true, require: true },
+    //Remove rating, comments and duplicate PodcastID
     rating: [{
         author: { type: Schema.Types.ObjectId, ref: 'User' },
         content: Number
@@ -13,7 +14,6 @@ const podcastSchema = new Schema({
         author: { type: Schema.Types.ObjectId, ref: 'User' },
         content: String
     }],
-    // Do we need to add the origin of the podcast? i.e. Spotify or ListenNotes?
     podcastId: {type: String, unique: true, require: true},
     origin: String
 })

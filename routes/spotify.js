@@ -3,7 +3,6 @@ const router = express.Router();
 const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
-//require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
 const Playlist = require('../models/Playlist');
 const actions = require('../modules/actions');

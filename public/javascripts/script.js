@@ -4,28 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 }, false);
 
-// let stars=['one','two','three','four','five'];
-
-// stars.forEach(function(star) {
-//   document.getElementById(star).addEventListener("click", function(){
-//     let checkingclass=document.getElementById(star).className;
-//     if(checkingclass.includes("unchecked"))
-//        {
-//    document.getElementById(star).classList.remove("unchecked");
-//   document.getElementById(star).classList.add("checked");
-//       }
-//     else
-//       {
-//   document.getElementById(star).classList.remove("checked");     
-//   document.getElementById(star).classList.add("unchecked");
-//       }
-// });
-// });
-// function myFunction() {
-//   document.getElementById("starButton").submit();
-//   console.log('checking function');
-// }
-
+//Remove logic for rating stars
 
 document.getElementById('one').addEventListener("click", function () {
   let checkingclass = document.getElementById('one').className;
