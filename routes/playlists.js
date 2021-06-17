@@ -1,25 +1,15 @@
 // const { Router } = require('express');
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User')
 const Playlist = require('../models/Playlist')
-const saltRounds = 10;
-const bcryptjs = require('bcryptjs');
-const mongoose = require('mongoose');
-const Podcast = require('../models/Podcast');
 const axios = require('axios');
-
-//require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
-const { findById } = require('../models/Podcast');
 
-// setting the spotify-api goes here:
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET
 });
 
-// Retrieve an access token
 spotifyApi
   .clientCredentialsGrant()
   .then(data => spotifyApi.setAccessToken(data.body['access_token']))
@@ -55,9 +45,11 @@ router.get('/playlists/:name', (req, res) => {
             .then((resp) => {
 
               let allEpisodes = resp.data.results
+              
               const bookmarkedEpisode = allEpisodes.filter(episode => episode.trackId === Number(currentPlaylist.episodes[i].episodeID))
 
-              console.log("THIS IS THE IT EPiSODE : " + bookmarkedEpisode[0].trackName)
+              //console.log("Bookmarked Epsiode: ", bookmarkedEpisode)
+              //console.log("THIS IS THE IT EPiSODE : " + bookmarkedEpisode[0].trackName)
 
               let episodeSummary = {
                 id: bookmarkedEpisode[0].trackId,
@@ -164,8 +156,5 @@ router.post("/playlist/:id/delete", (req, res) => {
     res.redirect('/playlists/bookmarked')
   })
 })
-
-
-
 
 module.exports = router;

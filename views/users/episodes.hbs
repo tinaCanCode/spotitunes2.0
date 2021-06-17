@@ -34,18 +34,19 @@
               </div>
               <div class='col-lg-8 mb-4 my-lg-auto'>
                 <h4 class='text-bright font-weight-bold mb-3'>{{this.name}}</h4>
-                {{!-- <p class='mb-4'>Release date: {{this.release_date}} </p> --}}
-                <p class='mb-4' font-weight-light> {{this.description}}</p>
+                <p class='mb-4' font-weight-light> {{this.podcastName}}</p>
+                <p class='mb-4'>Release date: {{this.release_date}} </p>
                 <p><a class="btn btn-outline-secondary btn-sm" href="{{this.external_urls.spotify}}"
                     target="_blank">Listen now</a></p>
-                <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
-                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark">
+                <form action="/spotify/details/{{this.podcastId}}/{{this.id}}/addtoplaylist" method="POST">
+                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
                 </form>
               </div>
             </div>
           </div>
 
           {{else}}
+          {{log this}}
           <div class='container my-5'>
             <div class='row py-4'>
               <div class='col-lg-4'>
@@ -53,12 +54,12 @@
               </div>
               <div class='col-lg-8 mb-4 my-lg-auto'>
                 <h4 class='text-bright font-weight-bold mb-3'>{{this.trackName}}</h4>
-                {{!-- <p class='mb-4'>Release date: {{this.release_date}} </p> --}}
                 <p class='mb-4' font-weight-light> {{this.collectionName}}</p>
-                <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}"
-                    target="_blank">Listen now</a></p>
-                <form action="/spotify/details/{{../podcasts.id}}/{{this.id}}/addtoplaylist" method="POST">
-                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark">
+                <p class='mb-4'>Release date: {{this.releaseDate}} </p>
+                <p><a class="btn btn-outline-secondary btn-sm" href="{{this.trackViewUrl}}" target="_blank">Listen
+                    now</a></p>
+                <form action="/itunes/details/{{this.collectionId}}/{{this.trackId}}/addtoplaylist" method="POST">
+                  <input class="btn btn-outline-secondary btn-sm" type="submit" value="Bookmark this episode">
                 </form>
               </div>
             </div>

@@ -8,33 +8,28 @@ const Podcast = require('../models/Podcast');
 const SpotifyWebApi = require('spotify-web-api-node');
 const saltRounds = 10;
 const bcryptjs = require('bcryptjs');
-const { findById } = require('../models/Podcast');
 const actions = require('../modules/actions');
+//const { findById } = require('../models/Podcast'); --> consider to remove
 
-// setting the spotify-api goes here:
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET
 });
 
-// Retrieve an access token
 spotifyApi
   .clientCredentialsGrant()
   .then(data => spotifyApi.setAccessToken(data.body['access_token']))
   .catch(error => console.log('Something went wrong when retrieving an access token', error));
 
-// display the signup form to users
+
+//////////// S I G N U P ///////////
 
 router.get('/signup', (req, res) => {
   res.render('auth/signup')
 });
 
-// process form data
-
 router.post('/signup', (req, res) => {
   const { username, email, password, repeatpassword } = req.body;
-  // const salt = bcrypt.genSaltSync(10);
-  // const pwHash = bcrypt.hashSync(password, salt);
 
   if (!username || !email || !password || !repeatpassword) {
     let preusername = username
@@ -66,7 +61,6 @@ router.post('/signup', (req, res) => {
     .then(salt => bcryptjs.hash(password, salt))
     .then(hashedPassword => {
       return User.create({
-        // username: username
         username,
         email,
         password: hashedPassword
@@ -102,13 +96,10 @@ router.post('/signup', (req, res) => {
 
 //////////// L O G I N ///////////
 
-// display the LOGIN form
 router.get('/login', (req, res) => res.render('auth/login'));
 
-// .post() login route ==> to process form data
 router.post('/login', (req, res, next) => {
   const { email, password } = req.body;
-  //console.log("SESSION: ", req.session)
 
   if (email === '' || password === '') {
     let preemaillog = email
@@ -125,7 +116,6 @@ router.post('/login', (req, res, next) => {
         res.render('auth/login', { errorMessage: 'Email is not registered. Try with other email.', preemaillog: preemaillog });
         return;
       } else if (bcryptjs.compareSync(password, user.password)) {
-        //res.render("users/user-profile", {user});
         req.session.currentUser = user;
 
         // Checking if there is a pending request before the user logged in
@@ -137,22 +127,6 @@ router.post('/login', (req, res, next) => {
                 .then(() => {
                   req.session.pendingRequest = null;
                   res.redirect("/userProfile")
-                });
-              // user tried to add a comment without being logged in
-            } else if (req.session.pendingRequest.action === "comment") {
-              actions.addComment(req.session.pendingRequest.podcastId, req.session.pendingRequest.commentContent, req.session.currentUser._id)
-                .then(() => {
-                  const showId = req.session.pendingRequest.podcastId
-                  req.session.pendingRequest = null;
-                  res.redirect(`/spotify/details/${showId}`)
-                });
-              // user tried to rate podcast without being logged in
-            } else if (req.session.pendingRequest.action === "rate") {
-              actions.ratePodcast(req.session.pendingRequest.podcastId, req.session.pendingRequest.ratingContent, req.session.currentUser._id)
-                .then(() => {
-                  const showId = req.session.pendingRequest.podcastId
-                  req.session.pendingRequest = null;
-                  res.redirect(`/spotify/details/${showId}`)
                 });
               //user tried to add an episode without being logged in
             } else if (req.session.pendingRequest.action === "addtoplaylist") {
@@ -167,40 +141,24 @@ router.post('/login', (req, res, next) => {
               console.log("This action is not defined for spotify")
             }
           } else {
-            // executed when the origin in the pendingRequest is listennotes
+            // executed when the origin in the pendingRequest is itunes
             // user tried to add podcast to favorite without being logged in
             if (req.session.pendingRequest.action === "addtofavorite") {
-              actions.addToFavoritesLN(req.session.pendingRequest.podcastId, req.session.currentUser._id)
+              actions.addToFavoritesIT(req.session.pendingRequest.podcastId, req.session.currentUser._id)
                 .then(() => {
                   req.session.pendingRequest = null;
                   res.redirect("/userProfile")
                 });
-              // user tried to add a comment without being logged in
-            } else if (req.session.pendingRequest.action === "comment") {
-              actions.addCommentLN(req.session.pendingRequest.podcastId, req.session.pendingRequest.commentContent, req.session.currentUser._id)
-                .then(() => {
-                  const showId = req.session.pendingRequest.podcastId
-                  req.session.pendingRequest = null;
-                  res.redirect(`/listennotes/details/${showId}`)
-                });
-              // user tried to rate podcast without being logged in
-            } else if (req.session.pendingRequest.action === "rate") {
-              actions.ratePodcastLN(req.session.pendingRequest.podcastId, req.session.pendingRequest.ratingContent, req.session.currentUser._id)
-                .then(() => {
-                  const showId = req.session.pendingRequest.podcastId
-                  req.session.pendingRequest = null;
-                  res.redirect(`/listennotes/details/${showId}`)
-                });
               //user tried to add an episode without being logged in
             } else if (req.session.pendingRequest.action === "addtoplaylist") {
-              actions.addToPlaylistLN(req.session.pendingRequest.episodeId, req.session.currentUser._id)
+              actions.addToPlaylistIT(req.session.pendingRequest.podcastId, req.session.pendingRequest.episodeId, req.session.currentUser._id)
                 .then(() => {
                   const showId = req.session.pendingRequest.podcastId;
                   req.session.pendingRequest = null;
-                  res.redirect(`/listennotes/details/${showId}`)
+                  res.redirect(`/itunes/details/${showId}`)
                 })
             } else {
-              console.log("This action is not defined for Listen Notes")
+              console.log("This action is not defined for itunes")
             }
           }
         } else {
@@ -214,11 +172,16 @@ router.post('/login', (req, res, next) => {
     .catch(error => next(error));
 });
 
+//logout
+router.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
+
 // Get user profile page and display favorite podcasts
 
 router.get('/userProfile', (req, res) => {
   //console.log(req.session.currentUser)
-  console.log("Calling the user profile GET route")
   if (req.session.currentUser.favoritePodcasts !== null) {
 
     User.findOne({ _id: req.session.currentUser._id })
@@ -238,7 +201,6 @@ router.get('/userProfile', (req, res) => {
           else if (podcast.origin === "itunes") {
             return await actions.lookupPodcastId(podcast.podcastId);
           }
-
         }))
       })
       .then(allPodcasts => {
@@ -254,7 +216,6 @@ router.get('/userProfile', (req, res) => {
 
 router.get('/userProfile/episodes', (req, res) => {
   //console.log(req.session.currentUser)
-  console.log("Calling the user profile episodes GET route")
   if (req.session.currentUser.favoritePodcasts !== null) {
 
     User.findOne({ _id: req.session.currentUser._id })
@@ -274,22 +235,35 @@ router.get('/userProfile/episodes', (req, res) => {
           else if (podcast.origin === "itunes") {
             return await actions.lookupPodcastEpisodes(podcast.podcastId);
           }
-
         }))
       })
       .then(allPodcasts => {
         //console.log("All podcasts :", allPodcasts)
         let today = new Date().getTime()
-        //console.log(today)
-
         let allEpisodes = []
 
         allPodcasts.forEach(podcast => {
+          // Processing spotify response
           if (podcast.body && podcast.body.episodes) {
-
-            //console.log(releaseDate)
+            console.log("Podcast body", podcast.body)
             let latestEpisodes = podcast.body.episodes.items.filter(episode => {
               let releaseDate = new Date(episode.release_date).getTime()
+              let daysElapsed = (today - releaseDate) / 86400000
+              return daysElapsed < 30
+            })
+            latestEpisodes.forEach(episode => {
+              episode.podcastId = podcast.body.id;
+              episode.podcastName = podcast.body.name;
+              //console.log("Episode: ", episode)
+              allEpisodes.push(episode)
+            })
+          }
+          // Processing itunes reponse
+          else {
+            let episodes = podcast.data.results
+            episodes.shift()
+            let latestEpisodes = episodes.filter(episode => {
+              let releaseDate = new Date(episode.releaseDate).getTime()
               let daysElapsed = (today - releaseDate) / 86400000
               return daysElapsed < 30
             })
@@ -297,21 +271,8 @@ router.get('/userProfile/episodes', (req, res) => {
               allEpisodes.push(episode)
             })
           }
-          else {
-            let episodes = podcast.data.results
-            episodes.shift()
-            let latestEpisodes = episodes.filter(episode => {
-              let releaseDate = new Date(episode.releaseDate).getTime()
-              let daysElapsed = (today - releaseDate) / 86400000
-              return daysElapsed < 10
-            })
-            latestEpisodes.forEach(episode => {
-              allEpisodes.push(episode)
-            })
-          }
         })
-        console.log("All Episodes: ", allEpisodes)
-
+        //console.log("All Episodes: ", allEpisodes)
         res.render('users/episodes', { user: req.session.currentUser, episodes: allEpisodes })
       })
 

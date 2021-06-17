@@ -1,17 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { exists } = require('../models/Podcast');
-const Podcast = require('../models/Podcast');
-const User = require('../models/User');
-const Playlist = require('../models/Playlist');
 const actions = require('../modules/actions');
-const { default: Axios } = require('axios');
 const https = require('https');
 
-/* GET itunes search page */
-router.get('/itunes', (req, res, next) => {
-  res.render('itunes/search');
-});
 
 // iTunes DETAILS page
 
@@ -39,19 +30,6 @@ router.get("/details/:showId", (req, res) => {
   })
 
 })
-
-
-// const fromDb = Podcast.exists({ podcastId: req.params.showId })
-//   .then(podcastExists => {
-//     if (podcastExists) {
-//       return Podcast.findOne({ podcastId: req.params.showId })
-//     } else {
-//       return Podcast.create({ podcastId: req.params.showId, origin: "itunes" })
-//     }
-//   })
-//   .catch(err => console.log('The error while searching show occurred: ', err));
-
-// Promise.all([fromItunes, fromDb]).then(values => {
 
 // Add iTunes Podcasts as favorites
 
@@ -105,7 +83,5 @@ router.post("/details/:podcastid/:id/addtoplaylist", (req, res) => {
       .then(() => res.redirect(`/itunes/details/${req.params.podcastid}`));
   }
 });
-
-
 
 module.exports = router;

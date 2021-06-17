@@ -1,22 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const itunesApi = require('itunes-web-api')
-const { exists } = require('../models/Podcast');
 const Podcast = require('../models/Podcast');
 const User = require('../models/User');
 const axios = require('axios');
-
-// same code in auth.js --> Can this duplication be removed?
-//require spotify Web api
 const SpotifyWebApi = require('spotify-web-api-node');
 
-// setting the spotify-api goes here:
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET
 });
 
-// Retrieve an access token
 spotifyApi
   .clientCredentialsGrant()
   .then(data => spotifyApi.setAccessToken(data.body['access_token']))
@@ -31,7 +24,6 @@ router.get('/search', (req, res, next) => {
 router.get('/search-results', (req, res) => {
   //console.log("HERE IS THE QUERY: " + req.query.podcast)
 
-  //const itunesSearch = itunesApi.podcast(req.query.podcast, { limit: 6 })
   const itunesSearch = axios.get(`https://itunes.apple.com/search?term=${req.query.podcast}&entity=podcast&limit=6`)
   const spotifySearch = spotifyApi.searchShows(req.query.podcast, { market: "DE", limit: 6 })
 
@@ -40,7 +32,7 @@ router.get('/search-results', (req, res) => {
     // console.log("THIS IS THE SEARCH RESULT SPTFY: " + response[1]);
     // console.log("THIS IS THE SEARCH RESULT FOR ITUNES: ", response[0]);
 
-    // Values stored into variables
+    // Results stored into variables
     let allResults = []
     let itunesResults = response[0].data.results
     let spotifyResults = response[1].body.shows.items
@@ -71,7 +63,7 @@ router.get('/search-results', (req, res) => {
       allResults.push(resultSummary)
     }
 
-    // sort function for array of object 
+    // sort podcasts by title 
     function compare(a, b) {
       if (a.title < b.title) {
         return -1;
@@ -95,5 +87,15 @@ router.get('/search-results', (req, res) => {
     .catch(err => console.log('The error while searching podcasts occurred: ', err))
 })
 
+// remove a podcast from the favorites Podcast array of user, keep podcast id in database
+
+router.post('/delete/:id', (req, res) => {
+  Podcast.findOne({ podcastId: req.params.id })
+  .then(podcast => {
+    console.log("Podcast we want to delete", podcast)
+    return User.findOneAndUpdate({ _id: req.session.currentUser._id }, { $pull: { favoritePodcasts: podcast._id } }, { new: true })
+  })
+  res.redirect("/userProfile");
+})
 
 module.exports = router;
