@@ -249,7 +249,7 @@ router.get('/userProfile/episodes', (req, res) => {
             let latestEpisodes = podcast.body.episodes.items.filter(episode => {
               let releaseDate = new Date(episode.release_date).getTime()
               let daysElapsed = (today - releaseDate) / 86400000
-              return daysElapsed < 30
+              return daysElapsed < 10
             })
             latestEpisodes.forEach(episode => {
               episode.podcastId = podcast.body.id;
@@ -265,7 +265,7 @@ router.get('/userProfile/episodes', (req, res) => {
             let latestEpisodes = episodes.filter(episode => {
               let releaseDate = new Date(episode.releaseDate).getTime()
               let daysElapsed = (today - releaseDate) / 86400000
-              return daysElapsed < 30
+              return daysElapsed < 10
             })
             latestEpisodes.forEach(episode => {
               allEpisodes.push(episode)
